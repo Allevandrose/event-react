@@ -1,0 +1,12 @@
+import ForgotPasswordForm from "../../components/forms/ForgotPasswordForm";
+
+const ForgotPassword = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="bg-white p-6 rounded shadow-md">
+      <h1 className="text-2xl font-bold mb-4">Forgot Password</h1>
+      <ForgotPasswordForm />
+    </div>
+  </div>
+);
+
+export default ForgotPassword;
