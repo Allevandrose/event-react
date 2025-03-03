@@ -1,23 +1,48 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../utils/api";
+import { getAllUsers, deleteUser as apiDeleteUser } from "../../utils/api";
 
-export const fetchAllUsers = createAsyncThunk("users/fetchAllUsers", async (_, { rejectWithValue }) => {
-  try {
-    const response = await api.getAllUsers();
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.error || "Failed to fetch users");
+// Fetch all users
+export const fetchAllUsers = createAsyncThunk(
+  "users/fetchAllUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log("Initiating fetchAllUsers request to /api/users");
+      const response = await getAllUsers(); // Use imported function
+      console.log("fetchAllUsers response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("fetchAllUsers error:", error);
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            return rejectWithValue("Unauthorized - Please log in again");
+          case 403:
+            return rejectWithValue("Forbidden - Admin access required");
+          case 404:
+            return rejectWithValue("Users endpoint not found");
+          default:
+            return rejectWithValue(error.response.data?.error || "Failed to fetch users");
+        }
+      } else {
+        return rejectWithValue("Network error - Unable to reach server");
+      }
+    }
   }
-});
+);
 
-export const deleteUser = createAsyncThunk("users/deleteUser", async (id, { rejectWithValue }) => {
-  try {
-    await api.deleteUser(id);
-    return id;
-  } catch (error) {
-    return rejectWithValue(error.error || "Failed to delete user");
+// Delete a user
+export const deleteUser = createAsyncThunk(
+  "users/deleteUser",
+  async (id, { rejectWithValue }) => {
+    try {
+      await apiDeleteUser(id); // Use renamed import
+      return id;
+    } catch (error) {
+      console.error("deleteUser error:", error);
+      return rejectWithValue(error.response?.data?.error || "Failed to delete user");
+    }
   }
-});
+);
 
 const userSlice = createSlice({
   name: "users",

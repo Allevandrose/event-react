@@ -9,6 +9,7 @@ const api = axios.create({
   },
 });
 
+// Request Interceptor: Attach Token to Requests
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
@@ -20,6 +21,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response Interceptor: Handle Unauthorized Access (401)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,12 +34,12 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
+/** 🔹🔹 AUTH API 🔹🔹 **/
 export const login = (credentials) => api.post("/auth/login", credentials);
 export const register = (data) => api.post("/auth/register", data);
 export const forgotPassword = (email) => api.post("/auth/forgot-password", { email });
 
-// Events API
+/** 🔹🔹 EVENTS API 🔹🔹 **/
 export const getEvents = () => api.get("/events");
 export const getAllEvents = () => api.get("/events/all");
 export const getEventById = (id) => api.get(`/events/${id}`);
@@ -45,16 +47,16 @@ export const createEvent = (data) => api.post("/events", data, { headers: { "Con
 export const updateEvent = (id, data) => api.put(`/events/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
 export const deleteEvent = (id) => api.delete(`/events/${id}`);
 
-// Bookings API
+/** 🔹🔹 BOOKINGS API 🔹🔹 **/
 export const createBooking = (data) => api.post("/bookings", data);
 
-// Payments API
+/** 🔹🔹 PAYMENTS API 🔹🔹 **/
 export const createPayment = (data) => api.post("/payments/checkout", data);
 export const getUserPayments = () => api.get("/payments/user");
 
-// Users API
+/** 🔹🔹 USERS API 🔹🔹 **/
 export const getUserProfile = () => api.get("/users/profile");
-export const getAllUsers = () => api.get("/users");
-export const deleteUser = (id) => api.delete(`/users/${id}`);
+export const getAllUsers = () => api.get("/users");  // ✅ Fetch all users
+export const deleteUser = (id) => api.delete(`/users/${id}`);  // ✅ Delete user by ID
 
 export default api;

@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents } from "../../redux/slices/eventSlice";
 import { fetchAllUsers } from "../../redux/slices/userSlice";
@@ -11,18 +10,27 @@ const AdminHome = () => {
   const { users, loading: usersLoading, error: usersError } = useSelector((state) => state.users);
 
   useEffect(() => {
-    console.log("Fetching events and users...");
+    console.log("AdminHome: Dispatching fetchEvents and fetchAllUsers...");
     dispatch(fetchEvents());
     dispatch(fetchAllUsers());
   }, [dispatch]);
 
-  if (eventsLoading || usersLoading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (eventsError || usersError) {
-    console.error("Error:", eventsError || usersError);
-    return <p className="text-center text-red-500">{eventsError || usersError}</p>;
+  if (eventsLoading || usersLoading) {
+    return <p className="text-center text-gray-500">Loading...</p>;
   }
-  console.log("Events:", events, "Users:", users);
 
+  if (eventsError || usersError) {
+    if (eventsError) console.error("Events Error:", eventsError);
+    if (usersError) console.error("Users Error:", usersError);
+    return (
+      <div className="text-center text-red-500">
+        {eventsError && <p>Events Error: {eventsError}</p>}
+        {usersError && <p>Users Error: {usersError}</p>}
+      </div>
+    );
+  }
+
+  console.log("Events:", events, "Users:", users);
   const futureEvents = events.filter((event) => new Date(event.date) >= new Date());
 
   return (

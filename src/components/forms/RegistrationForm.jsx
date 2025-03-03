@@ -1,4 +1,5 @@
 // src/components/forms/RegistrationForm.jsx
+import React from "react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../redux/slices/authSlice";
