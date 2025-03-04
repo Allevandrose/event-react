@@ -1,27 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllUsers, deleteUser as apiDeleteUser } from "../../utils/api";
 
-// Fetch all users
+// ✅ Fetch all users with improved error handling
 export const fetchAllUsers = createAsyncThunk(
   "users/fetchAllUsers",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("Initiating fetchAllUsers request to /api/users");
-      const response = await getAllUsers(); // Use imported function
+      console.log("Initiating fetchAllUsers request to /api/users...");
+      const response = await getAllUsers();
       console.log("fetchAllUsers response:", response.data);
       return response.data;
     } catch (error) {
       console.error("fetchAllUsers error:", error);
       if (error.response) {
-        switch (error.response.status) {
+        const { status, data } = error.response;
+        const errorMessage = data?.error || "Failed to fetch users";
+
+        switch (status) {
           case 401:
             return rejectWithValue("Unauthorized - Please log in again");
           case 403:
             return rejectWithValue("Forbidden - Admin access required");
           case 404:
-            return rejectWithValue("Users endpoint not found");
+            return rejectWithValue("Users not found");
           default:
-            return rejectWithValue(error.response.data?.error || "Failed to fetch users");
+            return rejectWithValue(errorMessage);
         }
       } else {
         return rejectWithValue("Network error - Unable to reach server");
@@ -30,13 +33,14 @@ export const fetchAllUsers = createAsyncThunk(
   }
 );
 
-// Delete a user
+// ✅ Delete a user with proper error handling
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (id, { rejectWithValue }) => {
     try {
-      await apiDeleteUser(id); // Use renamed import
-      return id;
+      console.log(`Deleting user with ID: ${id}`);
+      await apiDeleteUser(id);
+      return id; // Return deleted user ID for local state update
     } catch (error) {
       console.error("deleteUser error:", error);
       return rejectWithValue(error.response?.data?.error || "Failed to delete user");
@@ -44,6 +48,7 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+// ✅ Create user slice
 const userSlice = createSlice({
   name: "users",
   initialState: {
@@ -54,6 +59,7 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // ✅ Fetch users
       .addCase(fetchAllUsers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -66,6 +72,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // ✅ Delete user
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter((user) => user.id !== action.payload);
       })

@@ -1,49 +1,78 @@
-// src/components/forms/RegistrationForm.jsx
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const RegistrationForm = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "user" });
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    role: "user",
+  });
+
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(registerUser(formData))
-      .unwrap()
-      .then((data) => {
-        Swal.fire("Success!", "Registration successful!", "success");
-        if (data.user.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-      })
-      .catch((error) => {
-        Swal.fire("Error!", error.error || "Registration failed.", "error");
+    setLoading(true);
+
+    try {
+      const data = await dispatch(registerUser(formData)).unwrap();
+
+      Swal.fire({
+        icon: "success",
+        title: "Registration Successful!",
+        text: "You can now log in.",
       });
+
+      navigate(data.user.role === "admin" ? "/admin" : "/");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: error?.error || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg"
+    >
       <h2 className="text-2xl font-bold text-gray-800 text-center">Register</h2>
+
       <input
         type="text"
-        name="name"
-        value={formData.name}
+        name="first_name"
+        value={formData.first_name}
         onChange={handleChange}
-        placeholder="Full Name"
+        placeholder="First Name"
         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         required
       />
+
+      <input
+        type="text"
+        name="last_name"
+        value={formData.last_name}
+        onChange={handleChange}
+        placeholder="Last Name"
+        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+        required
+      />
+
       <input
         type="email"
         name="email"
@@ -53,6 +82,7 @@ const RegistrationForm = () => {
         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         required
       />
+
       <input
         type="password"
         name="password"
@@ -62,6 +92,7 @@ const RegistrationForm = () => {
         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         required
       />
+
       <select
         name="role"
         value={formData.role}
@@ -71,11 +102,15 @@ const RegistrationForm = () => {
         <option value="user">User</option>
         <option value="admin">Admin</option>
       </select>
+
       <button
         type="submit"
-        className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition duration-300"
+        className={`w-full bg-green-600 text-white p-3 rounded-lg transition duration-300 ${
+          loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-700"
+        }`}
+        disabled={loading}
       >
-        Register
+        {loading ? "Registering..." : "Register"}
       </button>
     </form>
   );

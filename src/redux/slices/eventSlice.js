@@ -77,7 +77,15 @@ const eventSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    resetEvents: (state) => {
+      state.events = [];
+      state.allEvents = [];
+      state.event = null;
+      state.loading = false;
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Fetch events
@@ -88,9 +96,10 @@ const eventSlice = createSlice({
       })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to load events";
+        state.events = [];
       })
-      
+
       // Fetch all events (admin)
       .addCase(fetchAllEvents.pending, (state) => { state.loading = true; })
       .addCase(fetchAllEvents.fulfilled, (state, action) => {
@@ -131,4 +140,5 @@ const eventSlice = createSlice({
   },
 });
 
+export const { resetEvents } = eventSlice.actions;
 export default eventSlice.reducer;

@@ -46,13 +46,18 @@ const EventCard = ({ event, onBook }) => {
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-300">
-      {event.image && (
-        <img
-          src={`${API_BASE_URL}${event.image}`}
-          alt={event.name}
-          className="w-full h-48 object-cover rounded-t-lg mb-4"
-        />
-      )}
+      {/* Event Image with Fallback */}
+      <img
+        src={`${API_BASE_URL}${event.image}`}
+        alt={event.name}
+        className="w-full h-48 object-cover rounded-t-lg mb-4"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = "/default-event.jpg"; // Fallback image
+        }}
+      />
+
+      {/* Event Details */}
       <h3 className="text-xl font-semibold text-gray-800 mb-2">{event.name}</h3>
       <p className="text-gray-600 mb-2">{event.description}</p>
       <p className="text-gray-700"><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</p>
@@ -62,6 +67,8 @@ const EventCard = ({ event, onBook }) => {
       <p className="text-gray-700"><strong>Regular Price:</strong> ${event.price_regular}</p>
       <p className="text-gray-700"><strong>VIP Tickets:</strong> {event.tickets_vip}</p>
       <p className="text-gray-700"><strong>Regular Tickets:</strong> {event.tickets_regular}</p>
+
+      {/* User Booking Button */}
       {user?.role === "user" && (
         <button
           onClick={() => onBook(event)}
@@ -75,6 +82,8 @@ const EventCard = ({ event, onBook }) => {
           {event.tickets_vip === 0 && event.tickets_regular === 0 ? "Sold Out" : "Book Now"}
         </button>
       )}
+
+      {/* Admin Update/Delete Buttons */}
       {user?.role === "admin" && (
         <div className="mt-4 flex space-x-4">
           <button
