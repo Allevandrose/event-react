@@ -10,7 +10,6 @@ const RegistrationForm = () => {
     last_name: "",
     email: "",
     password: "",
-    role: "user",
   });
 
   const [loading, setLoading] = useState(false);
@@ -34,7 +33,7 @@ const RegistrationForm = () => {
         text: "You can now log in.",
       });
 
-      navigate(data.user.role === "admin" ? "/admin" : "/");
+      navigate("/");
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -92,16 +91,6 @@ const RegistrationForm = () => {
         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
         required
       />
-
-      <select
-        name="role"
-        value={formData.role}
-        onChange={handleChange}
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-      >
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
 
       <button
         type="submit"

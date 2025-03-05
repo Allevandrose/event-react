@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { login, register, forgotPassword as apiForgotPassword } from "../../utils/api";
-import { jwtDecode } from "jwt-decode";
 import api from "../../utils/api"; // Import API instance
 
 // ✅ Fetch User Profile Thunk
@@ -28,11 +27,7 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await login(credentials);
-      const { accessToken } = response.data;
-
-      // Decode the JWT token to extract user info
-      const decoded = jwtDecode(accessToken);
-      const user = { id: decoded.id, role: decoded.role };
+      const { accessToken, user } = response.data;
 
       // Store tokens and user data in localStorage
       localStorage.setItem("accessToken", accessToken);
@@ -45,17 +40,13 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// ✅ Register User Thunk
+// ✅ Register User Thunk (Updated)
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (data, { rejectWithValue }) => {
     try {
       const response = await register(data);
-      const { accessToken } = response.data;
-
-      // Decode the JWT token to extract user info
-      const decoded = jwtDecode(accessToken);
-      const user = { id: decoded.id, role: decoded.role };
+      const { accessToken, user } = response.data;
 
       // Store tokens and user data in localStorage
       localStorage.setItem("accessToken", accessToken);
