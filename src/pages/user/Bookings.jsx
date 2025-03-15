@@ -20,7 +20,10 @@ const Bookings = () => {
                 <ul className="space-y-2">
                     {bookings.map((booking) => (
                         <li key={booking.id} className="border p-2 rounded">
-                            Event ID: {booking.event_id} | Type: {booking.ticket_type} | Quantity: {booking.quantity} | Total: ${booking.total_price}
+                            <strong>Event:</strong> {booking.event_name} | 
+                            <strong> Ticket-type:</strong> {booking.ticket_type} | 
+                            <strong> Ticket-Quantity:</strong> {booking.quantity} | 
+                            <strong> Amt-Total:</strong> ${booking.total_price}
                         </li>
                     ))}
                 </ul>
